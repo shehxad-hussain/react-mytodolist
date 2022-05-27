@@ -5,27 +5,60 @@ const Todo = () => {
      
     const  [inputData, setInputData] = useState('');
     const [items, setItems] = useState([]);
+    const [toggleSubmit, setToggleSubmit] = useState(true);
+    const [isEditItem, setIsEditItem] = useState(null);
 
-  // delete the items
+  // add  the items
 
     const  addItem = () => {
         if (!inputData) {
+            alert('plzz fill data');
+        } else if(inputData && !toggleSubmit) {
+            setItems(
+                items.map((elem) => {
+                    if (elem.id === isEditItem) {
+                        return { ...elem, name: inputData }
+                    }
+                    return elem;
+                })
+            )
+                 setToggleSubmit(true);
 
-        }else{
-            setItems([...items, inputData]);
-            setInputData('');
+                 setInputData('');
+
+                 setIsEditItem(null);
+        } else {
+            const allInputData = { id: new Date().getTime().toString(), name:inputData }
+            setItems([...items, allInputData]);
+            setInputData('')
         }
+    
     } 
     
 
     // delete the items
-    const deleteItem = (id) => {
-        console.log(id);
-        const updateditems = items.filter((elem,index) => {
-            return index !== id;
+    const deleteItem = (index) => {
+        
+        const updateditems = items.filter((elem) => {
+            return index !== elem.id;
         });
 
         setItems(updateditems);
+    }
+
+    // edit the items
+    const editItem = (id) => {
+        let newEditItem = items.find((elem) => {
+            return elem.id === id
+        });
+        console.log(newEditItem);
+
+        setToggleSubmit(false);
+
+        setInputData(newEditItem.name);
+
+        setIsEditItem(id);
+
     }
 
       // remove all 
@@ -46,8 +79,12 @@ const Todo = () => {
                            value={inputData} 
                            onChange={(e) => setInputData(e.target.value) }
                         />
+                         {
+                            toggleSubmit ? <i className="fa fa-plus add-btn" title="Add Item" onClick={addItem}></i> :
+                             <i className="far fa-edit add-btn" title="Update Item" onClick={addItem}></i>
+                        }
 
-                        <i className="fa fa-plus add-btn" title="Add Item" onClick={addItem}></i>
+                      
                        
                     </div>
 
@@ -59,19 +96,22 @@ const Todo = () => {
                     <div className="showItems">
                          
                         {
-                            items.map((elem,ind) => {
+                            items.map((elem) => {
                                 return (
-                                    <div className="eachItem" key={elem.ind}>
-                                        <h3>{elem}</h3>
-                                        <i className="far fa-trash-alt add-btn" title="Delete Item" onClick={() => deleteItem(ind)}></i>
+                                    <div className="eachItem" key={elem.id}>
+                                        <h3>{elem.name}</h3>
+                                        <div className='todo-btn'>
+                                            <i className="far fa-edit add-btn" title="Edit Item" onClick={() => editItem(elem.id)}></i>
+                                            <i className="far fa-trash-alt add-btn" title="Delete Item" onClick={() => deleteItem(elem.id)}></i>
                                           
+                                        </div>
+                                        
                                     </div>
                                 )
                             })
 
                         }
                        
-                        {/* <i className="far fa-edit add-btn" title="Edit Item" onClick={() => editItem(elem.ind)}></i> */}
                     </div>
               
                        
